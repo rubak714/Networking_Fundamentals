@@ -389,8 +389,6 @@ Here is a non-Mermaid, GitHub-compatible visualization of the NodePort → Clust
 
 This setup provides external access to internal Pods via a stable Node IP and port.
 
----
-
 This shows how services and routing abstract real Pod IPs while providing external access to containerized apps.
 
 ---
