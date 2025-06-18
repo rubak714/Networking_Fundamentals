@@ -348,41 +348,48 @@ Here's a visual overview showing how Kubernetes is structured around control pla
 
 This diagram illustrates how networking flows through a Kubernetes cluster when you expose a pod to the outside world.
 
-## Mermaid Diagram
+## 🔗 Kubernetes Networking Flow (ASCII Version)
 
-```mermaid
-flowchart TD
-    subgraph Client
-        A[External Client (Browser or Curl)]
-    end
+Here is a non-Mermaid, GitHub-compatible visualization of the NodePort → ClusterIP → Pod communication flow:
 
-    subgraph NodePort_Service[NodePort Service\n192.168.1.100:30080]
-        B[NodePort: 30080]
-    end
-
-    subgraph ClusterIP_Service[ClusterIP Service\n10.96.0.1]
-        C1[ClusterIP]
-    end
-
-    subgraph Pods
-        D1[Pod A\n10.244.0.3]
-        D2[Pod B\n10.244.0.4]
-    end
-
-    A --> B
-    B --> C1
-    C1 --> D1
-    C1 --> D2
 ```
++----------------------------+
+|  External Client (curl)   |
+|   http://NodeIP:30080     |
++-------------|-------------+
+              |
+              v
++----------------------------+
+|    NodePort Service        |
+|     (Port: 30080)          |
+|  IP: 192.168.1.100:30080   |
++-------------|-------------+
+              |
+              v
++----------------------------+
+|     ClusterIP Service      |
+|         IP: 10.96.0.1      |
++-------------|-------------+
+      |                   |
+      v                   v
++------------+     +------------+
+|   Pod A    |     |   Pod B    |
+| 10.244.0.3 |     | 10.244.0.4 |
++------------+     +------------+
+```
+
 ---
 
-### What Happens:
+### Flow Explanation
 
-1. A **Pod** is assigned an IP (`10.244.0.3`) by the **CNI plugin**.
-2. You expose the Pod via a **Service** (default type is ClusterIP).
-3. To make it externally accessible, you create a **NodePort** service.
-4. External users hit the **Node’s IP and assigned port** (like `http://192.168.1.100:30080`).
-5. Kubernetes routes the request via kube-proxy → ClusterIP → Pod.
+1. External users hit the **Node’s IP and assigned port** (like `http://192.168.1.100:30080`) or **Client** (browser or curl) makes a request to `http://192.168.1.100:30080`.
+2. To make it externally accessible, you create a **NodePort** service. **NodePort Service** listens on this external port and IP.
+3. It routes the request to a **ClusterIP Service** (internal virtual IP). You expose the Pod via a **Service** (default type is ClusterIP). A **Pod** is assigned an IP (`10.244.0.3`) by the **CNI plugin**.
+4. **kube-proxy** forwards traffic to one of the backend Pods. Kubernetes routes the request via kube-proxy → ClusterIP → Pod.
+
+This setup provides external access to internal Pods via a stable Node IP and port.
+
+---
 
 This shows how services and routing abstract real Pod IPs while providing external access to containerized apps.
 
