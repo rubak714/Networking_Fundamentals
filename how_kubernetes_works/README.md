@@ -374,6 +374,7 @@ flowchart TD
     C1 --> D1
     C1 --> D2
 ```
+---
 
 ### What Happens:
 
@@ -385,6 +386,7 @@ flowchart TD
 
 This shows how services and routing abstract real Pod IPs while providing external access to containerized apps.
 
+---
 
 Below is a simplified ASCII-style diagram illustrating the relationship between the control plane, nodes, kubelets, and pods:
 
