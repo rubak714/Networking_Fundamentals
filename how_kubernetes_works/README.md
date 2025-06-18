@@ -344,7 +344,47 @@ This design is extremely common in cloud-native applications and enables fast, i
 
 Here's a visual overview showing how Kubernetes is structured around control plane components and worker nodes:
 
-## 🔗 Visual: Kubernetes Architecture & Control Plane
+![Kubernetes Networking Flow](kubernetes_networking_flow.png)
+
+This diagram illustrates how networking flows through a Kubernetes cluster when you expose a pod to the outside world.
+
+## Mermaid Diagram
+
+```mermaid
+flowchart TD
+    subgraph Client
+        A[External Client (Browser or Curl)]
+    end
+
+    subgraph NodePort_Service[NodePort Service\n192.168.1.100:30080]
+        B[NodePort: 30080]
+    end
+
+    subgraph ClusterIP_Service[ClusterIP Service\n10.96.0.1]
+        C1[ClusterIP]
+    end
+
+    subgraph Pods
+        D1[Pod A\n10.244.0.3]
+        D2[Pod B\n10.244.0.4]
+    end
+
+    A --> B
+    B --> C1
+    C1 --> D1
+    C1 --> D2
+```
+
+### What Happens:
+
+1. A **Pod** is assigned an IP (`10.244.0.3`) by the **CNI plugin**.
+2. You expose the Pod via a **Service** (default type is ClusterIP).
+3. To make it externally accessible, you create a **NodePort** service.
+4. External users hit the **Node’s IP and assigned port** (like `http://192.168.1.100:30080`).
+5. Kubernetes routes the request via kube-proxy → ClusterIP → Pod.
+
+This shows how services and routing abstract real Pod IPs while providing external access to containerized apps.
+
 
 Below is a simplified ASCII-style diagram illustrating the relationship between the control plane, nodes, kubelets, and pods:
 
@@ -383,17 +423,11 @@ Below is a simplified ASCII-style diagram illustrating the relationship between 
 ### 🔗 What This Diagram Shows:
 
 * The control plane houses all orchestration components.
-* Each worker node runs a `kubelet` agent and its own networking proxy (`kube-proxy`).
+* Each worker node runs a `kubelet` agent and its own networking proxy (`kube-proxy`) or each **worker node** has a `kubelet` that receives pod instructions.
 * Pods are scheduled on the nodes and managed by the local kubelet.
 * Communication and commands are initiated via `kubectl`, routed through the API Server.
-
----
-
-### 🔗 What This Diagram Shows:
-
 * Control plane components live on the **master node**.
 * The **API Server** is the central hub of communication.
-* Each **worker node** has a `kubelet` that receives pod instructions.
 * **Pods** are the actual workloads (apps) that run inside the nodes.
 * Communication flows from user → API server → kubelets → pods.
 
@@ -413,7 +447,9 @@ Below is a simplified ASCII-style diagram illustrating the relationship between 
 
 ---
 
-### 🔗 What Does the Kubelet Depend On?
+## 🔗 What Does the Kubelet Depend On?
+
+### 🔗 Answer:
 
 1. **The Node**:
 
@@ -503,7 +539,9 @@ Let’s say **Company A** is a fintech startup with a web app that includes:
 
 ## 🔗 How Is a Kubernetes Cluster Created (And How Many Can You Have?)
 
-### 🔗 Single Command to Create a Cluster
+### 🔗 Answer:
+
+#### 🔗 Single Command to Create a Cluster
 
 If you're starting locally or for development purposes, this command creates a quick Kubernetes cluster:
 
@@ -525,13 +563,17 @@ kubeadm init
 
 ---
 
-### 🔗 Is a Cluster Created After That?
+## 🔗 Is a Cluster Created After That?
+
+### 🔗 Answer:
 
 Yes! Once the **API server and kubelet are running**, your **cluster exists**. Even with just one node, it's a valid Kubernetes cluster.
 
 ---
 
-### 🔗 How Many Clusters Can You Create?
+## 🔗 How Many Clusters Can You Create?
+
+### 🔗 Answer:
 
 There’s no strict limit defined by Kubernetes itself:
 
@@ -556,6 +598,8 @@ Each cluster runs independently and you can use `kubectl config use-context` to 
 ---
 
 ## 🔗 Real-World Example: How a Company Uses Kubernetes
+
+### 🔗 Answer:
 
 Let’s say **Company A** is a fintech startup with a web app that includes:
 
@@ -593,7 +637,7 @@ Let’s say **Company A** is a fintech startup with a web app that includes:
 
 ---
 
-## 🔗 Summary Diagram
+## 🔗 Again Summary Diagram
 
 ```mermaid
 flowchart TD
@@ -613,5 +657,3 @@ flowchart TD
 * **Services group pods** and provide **stable IPs**.
 * **NodePorts expose services** to the outside world.
 * The API server orchestrates the entire communication using control-plane components.
-
-Would you like this section merged into your main IP Networking README with visuals?
