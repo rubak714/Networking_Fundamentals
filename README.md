@@ -158,6 +158,99 @@ curl http://<vm-ip>:8080  # or nodePort IP
 
 ---
 
+# 🔗 IP Addressing Explained Visually for Ubuntu + Containers
+
+This section simplifies **how IP addressing works** when deploying containers using **Docker**, **Kubernetes**, and **OpenShift** on an Ubuntu virtual machine.
+
+---
+
+## 🔗 Ubuntu Host IP Basics
+
+```mermaid
+flowchart TD
+    Internet -->|Router assigns| eth0[Ubuntu VM eth0: 192.168.1.100]
+```
+
+* Ubuntu gets its IP via DHCP or NAT.
+* Use `ip addr` to find this.
+
+---
+
+## 🔗 Docker Networking - Bridge Mode
+
+```mermaid
+flowchart TD
+    Ubuntu[Ubuntu VM Host] --> Docker0[docker0 Bridge: 172.17.0.1]
+    Docker0 --> C1[Container A: 172.17.0.2]
+    Docker0 --> C2[Container B: 172.17.0.3]
+    Internet -->|Port 8080| Ubuntu
+    Ubuntu -->|Forwarded to port 80| C1
+```
+
+```bash
+docker run -p 8080:80 myapp
+```
+
+Access the app via: `http://192.168.1.100:8080`
+
+---
+
+## 🔗 Kubernetes Networking
+
+### Deployment Flow
+
+```mermaid
+flowchart TD
+    User -->|kubectl apply| API[API Server]
+    API --> Scheduler
+    Scheduler --> Node1
+    Scheduler --> Node2
+    Node1 -->|Pod IP: 10.244.0.2| Pod1
+    Node2 -->|Pod IP: 10.244.0.3| Pod2
+    Service -->|Routes| Pod1 & Pod2
+```
+
+### Service Exposure
+
+```bash
+kubectl expose deployment myapp --type=NodePort --port=80
+```
+
+```mermaid
+flowchart LR
+    Browser --> NodePort[NodePort: 30080]
+    NodePort --> Service[ClusterIP: 10.96.0.1]
+    Service --> PodA[10.244.0.2]
+    Service --> PodB[10.244.0.3]
+```
+
+---
+
+## 🔗 OpenShift Routing
+
+```mermaid
+flowchart TD
+    Browser --> Route[OpenShift Route (HTTPS)]
+    Route --> Service[OpenShift Service]
+    Service --> Pod[Application Pod]
+```
+
+Use `oc get routes` to retrieve the public-facing URL.
+
+---
+
+## 🔗 Summary Table
+
+| Component        | Gets IP From    | Visible To         | Example IP    |
+| ---------------- | --------------- | ------------------ | ------------- |
+| Ubuntu Host      | LAN / NAT       | External network   | 192.168.1.100 |
+| docker0 bridge   | Internal Docker | Host only          | 172.17.0.1    |
+| Docker Container | docker0 network | Other containers   | 172.17.0.2    |
+| Kubernetes Pod   | CNI plugin      | Cluster-wide       | 10.244.0.2    |
+| K8s Service      | Kubernetes      | Cluster / NodePort | 10.96.0.1     |
+
+---
+
 ## 🔗 Summary
 
 Understanding how containers, pods, and services communicate using IP addresses is **essential** for any beginner working on Ubuntu. Whether it’s Docker’s bridge, Kubernetes CNI, or OpenShift’s Route model—everything starts with understanding the network path.
