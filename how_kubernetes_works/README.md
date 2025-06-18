@@ -344,29 +344,63 @@ This design is extremely common in cloud-native applications and enables fast, i
 
 Here's a visual overview showing how Kubernetes is structured around control plane components and worker nodes:
 
-```mermaid
+````mermaid
 flowchart TB
     subgraph Control_Plane
+        API_Server[API Server]
+        Scheduler[Scheduler]
+        Controller[Controller Manager]
+        Etcd[etcd Key-Value Store]
+    end
+
+    subgraph Worker_Node_1
+        Kubelet1[Kubelet]
+        KubeProxy1[kube-proxy]
+        Pod1[Pod A]
+        Pod2[Pod B]
+    end
+
+    subgraph Worker_Node_2
+        Kubelet2[Kubelet]
+        KubeProxy2[kube-proxy]
+        Pod3[Pod C]
+    end
+
+    User[DevOps (kubectl)]
+    User --> API_Server
+    API_Server --> Scheduler
+    API_Server --> Controller
+    API_Server --> Etcd
+    API_Server --> Kubelet1
+    API_Server --> Kubelet2
+    Scheduler --> Kubelet1
+    Scheduler --> Kubelet2
+    Kubelet1 --> Pod1
+    Kubelet1 --> Pod2
+    Kubelet2 --> Pod3
+```mermaid
+flowchart TB
+    subgraph CP [Control Plane (Master Node)]
         API[API Server]
         SCH[Scheduler]
         CM[Controller Manager]
         ETCD[etcd (Key-Value Store)]
     end
 
-    subgraph Worker_Node_1
+    subgraph Node1 [Worker Node 1]
         K1[Kubelet1]
         Proxy1[kube-proxy]
         PodA[Pod A]
         PodB[Pod B]
     end
 
-    subgraph Worker_Node_2
+    subgraph Node2 [Worker Node 2]
         K2[Kubelet2]
         Proxy2[kube-proxy]
         PodC[Pod C]
     end
 
-    User[User via kubectl]
+    User[User or DevOps via kubectl]
     User --> API
     API --> SCH
     API --> CM
@@ -378,8 +412,7 @@ flowchart TB
     K1 --> PodA
     K1 --> PodB
     K2 --> PodC
-
-```
+````
 
 ### 🔗 What This Diagram Shows:
 
@@ -388,6 +421,7 @@ flowchart TB
 * Each **worker node** has a `kubelet` that receives pod instructions.
 * **Pods** are the actual workloads (apps) that run inside the nodes.
 * Communication flows from user → API server → kubelets → pods.
+
 ---
 
 ## 🔗 How Many Kubelets Can Be Created and What Do They Depend On?
