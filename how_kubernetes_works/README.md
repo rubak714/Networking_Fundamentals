@@ -346,27 +346,27 @@ Here's a visual overview showing how Kubernetes is structured around control pla
 
 ```mermaid
 flowchart TB
-    subgraph CP [Control Plane (Master Node)]
+    subgraph Control_Plane
         API[API Server]
         SCH[Scheduler]
         CM[Controller Manager]
         ETCD[etcd (Key-Value Store)]
     end
 
-    subgraph Node1 [Worker Node 1]
+    subgraph Worker_Node_1
         K1[Kubelet1]
         Proxy1[kube-proxy]
         PodA[Pod A]
         PodB[Pod B]
     end
 
-    subgraph Node2 [Worker Node 2]
+    subgraph Worker_Node_2
         K2[Kubelet2]
         Proxy2[kube-proxy]
         PodC[Pod C]
     end
 
-    User[User or DevOps via kubectl]
+    User[User via kubectl]
     User --> API
     API --> SCH
     API --> CM
@@ -378,6 +378,7 @@ flowchart TB
     K1 --> PodA
     K1 --> PodB
     K2 --> PodC
+
 ```
 
 ### 🔗 What This Diagram Shows:
