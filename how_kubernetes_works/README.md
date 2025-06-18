@@ -344,75 +344,50 @@ This design is extremely common in cloud-native applications and enables fast, i
 
 Here's a visual overview showing how Kubernetes is structured around control plane components and worker nodes:
 
-````mermaid
-flowchart TB
-    subgraph Control_Plane
-        API_Server[API Server]
-        Scheduler[Scheduler]
-        Controller[Controller Manager]
-        Etcd[etcd Key-Value Store]
-    end
+## 🔗 Visual: Kubernetes Architecture & Control Plane
 
-    subgraph Worker_Node_1
-        Kubelet1[Kubelet]
-        KubeProxy1[kube-proxy]
-        Pod1[Pod A]
-        Pod2[Pod B]
-    end
+Below is a simplified ASCII-style diagram illustrating the relationship between the control plane, nodes, kubelets, and pods:
 
-    subgraph Worker_Node_2
-        Kubelet2[Kubelet]
-        KubeProxy2[kube-proxy]
-        Pod3[Pod C]
-    end
+```
++-----------------------------+
+|        Control Plane        |
+|-----------------------------|
+|  [API Server]               |
+|  [Scheduler]                |
+|  [Controller Manager]       |
+|  [etcd (KV Store)]          |
++-------------|---------------+
+              |
+              v
++-------------|----------------+        +-------------|----------------+
+|         Worker Node 1        |        |         Worker Node 2        |
+|------------------------------|        |------------------------------|
+|  [Kubelet]                   |        |  [Kubelet]                   |
+|  [kube-proxy]                |        |  [kube-proxy]                |
+|   +-------------+            |        |   +-------------+            |
+|   | Pod A       |            |        |   | Pod C       |            |
+|   +-------------+            |        |   +-------------+            |
+|   +-------------+            |        |                              |
+|   | Pod B       |            |        |                              |
+|   +-------------+            |        |                              |
++------------------------------+        +------------------------------+
 
-    User[DevOps (kubectl)]
-    User --> API_Server
-    API_Server --> Scheduler
-    API_Server --> Controller
-    API_Server --> Etcd
-    API_Server --> Kubelet1
-    API_Server --> Kubelet2
-    Scheduler --> Kubelet1
-    Scheduler --> Kubelet2
-    Kubelet1 --> Pod1
-    Kubelet1 --> Pod2
-    Kubelet2 --> Pod3
-```mermaid
-flowchart TB
-    subgraph CP [Control Plane (Master Node)]
-        API[API Server]
-        SCH[Scheduler]
-        CM[Controller Manager]
-        ETCD[etcd (Key-Value Store)]
-    end
+             ^                                     ^
+             |                                     |
+        +----------+                        +----------+
+        | kubectl  |                        | kubectl  |
+        |  (User)  |                        |  (User)  |
+        +----------+                        +----------+
+```
 
-    subgraph Node1 [Worker Node 1]
-        K1[Kubelet1]
-        Proxy1[kube-proxy]
-        PodA[Pod A]
-        PodB[Pod B]
-    end
+### 🔗 What This Diagram Shows:
 
-    subgraph Node2 [Worker Node 2]
-        K2[Kubelet2]
-        Proxy2[kube-proxy]
-        PodC[Pod C]
-    end
+* The control plane houses all orchestration components.
+* Each worker node runs a `kubelet` agent and its own networking proxy (`kube-proxy`).
+* Pods are scheduled on the nodes and managed by the local kubelet.
+* Communication and commands are initiated via `kubectl`, routed through the API Server.
 
-    User[User or DevOps via kubectl]
-    User --> API
-    API --> SCH
-    API --> CM
-    API --> ETCD
-    API --> K1
-    API --> K2
-    SCH --> K1
-    SCH --> K2
-    K1 --> PodA
-    K1 --> PodB
-    K2 --> PodC
-````
+---
 
 ### 🔗 What This Diagram Shows:
 
