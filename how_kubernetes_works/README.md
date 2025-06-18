@@ -344,7 +344,10 @@ This design is extremely common in cloud-native applications and enables fast, i
 
 Here's a visual overview showing how Kubernetes is structured around control plane components and worker nodes:
 
-![Kubernetes Networking Flow](kubernetes_networking_flow.png)
+<p align="center">
+  <img src="kubernetes_networking_flow.png" alt="Kubernetes Networking Flow" width="500"/>
+</p>
+
 
 This diagram illustrates how networking flows through a Kubernetes cluster when you expose a pod to the outside world.
 
