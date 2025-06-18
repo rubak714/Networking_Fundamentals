@@ -142,7 +142,7 @@ http://192.168.1.100:30080
 
 * The request hits the node → matches NodePort → routed to the Service (10.96.0.1) → forwarded to the Pod (10.244.0.2)
 
-# 🔗 More on Kubernetes Concepts: Kubelet vs API Server & Kubelet1 vs Kubelet2
+## 🔗 More on Kubernetes Concepts: Kubelet vs API Server & Kubelet1 vs Kubelet2
 
 Understanding the **roles of the API server and kubelet**, and the difference between multiple kubelet agents in a cluster, is essential to grasp Kubernetes architecture. Here's a simple breakdown.
 
@@ -346,7 +346,7 @@ Here's a visual overview showing how Kubernetes is structured around control pla
 
 ```mermaid
 flowchart TB
-    subgraph Control_Plane [Control Plane (Master Node)]
+    subgraph CP [Control Plane (Master Node)]
         API[API Server]
         SCH[Scheduler]
         CM[Controller Manager]
@@ -380,12 +380,13 @@ flowchart TB
     K2 --> PodC
 ```
 
-This diagram shows:
+### 🔗 What This Diagram Shows:
 
-* Control plane components on the master node
-* How the **API Server** communicates with the kubelets on each node
-* How pods are created and managed on each node
-
+* Control plane components live on the **master node**.
+* The **API Server** is the central hub of communication.
+* Each **worker node** has a `kubelet` that receives pod instructions.
+* **Pods** are the actual workloads (apps) that run inside the nodes.
+* Communication flows from user → API server → kubelets → pods.
 ---
 
 ## 🔗 How Many Kubelets Can Be Created and What Do They Depend On?
