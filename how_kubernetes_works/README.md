@@ -142,7 +142,7 @@ http://192.168.1.100:30080
 
 * The request hits the node → matches NodePort → routed to the Service (10.96.0.1) → forwarded to the Pod (10.244.0.2)
 
-# 🔗 Kubernetes Concepts: Kubelet vs API Server & Kubelet1 vs Kubelet2
+# 🔗 More on Kubernetes Concepts: Kubelet vs API Server & Kubelet1 vs Kubelet2
 
 Understanding the **roles of the API server and kubelet**, and the difference between multiple kubelet agents in a cluster, is essential to grasp Kubernetes architecture. Here's a simple breakdown.
 
